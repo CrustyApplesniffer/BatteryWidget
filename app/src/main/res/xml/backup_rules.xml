@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!--
+    TODO: Use <include> and <exclude> tags to control what is backed up.
+    Applications should consider what data they should back up as part of their
+    disaster recovery plan.
+
+    By default, the following files are backed up:
+    - Shared preferences files
+    - Files in the getFilesDir() or getDatabasePath(String) directories
+    - Files in the getExternalFilesDir(String) directory
+
+    By default, the following files are NOT backed up:
+    - Files in the getCacheDir() directory
+    - Files in the getExternalCacheDir() directory
+    - Files in the getNoBackupFilesDir() directory
+
+    For more details, see https://developer.android.com/guide/topics/data/autobackup
+    -->
+</full-backup-content>
