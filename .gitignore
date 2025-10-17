@@ -1,3 +1,10 @@
+# JetBrains IDE
+.idea/
+!.idea/modules.xml
+!.idea/misc.xml
+!.idea/vcs.xml
+!.idea/encodings.xml
+
 *.iml
 .gradle
 /local.properties

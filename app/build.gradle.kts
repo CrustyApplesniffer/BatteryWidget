@@ -3,27 +3,73 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+// Kotlin-only approach to read local.properties
+fun getLocalProperty(key: String): String? {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (!localPropertiesFile.exists()) return null
+
+    return try {
+        localPropertiesFile.useLines { lines ->
+            lines.map { it.trim() }
+                .filter { it.isNotEmpty() && !it.startsWith("#") }
+                .find { it.startsWith("$key=") }
+                ?.substringAfter("=")
+                ?.trim()
+        }
+    } catch (e: Exception) {
+        null
+    }
+}
+
 android {
     namespace = "com.prometeo.batterywidget"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.prometeo.batterywidget"
         minSdk = 21
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 35
+        versionCode = 2
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(
+                getLocalProperty("keystore.file") ?:
+                System.getenv("KEYSTORE_FILE") ?:
+                "debug.keystore"
+            )
+            storePassword =
+                getLocalProperty("keystore.password") ?:
+                        System.getenv("KEYSTORE_PASSWORD") ?:
+                        "android"
+            keyAlias =
+                getLocalProperty("key.alias") ?:
+                        System.getenv("KEY_ALIAS") ?:
+                        "androiddebugkey"
+            keyPassword =
+                getLocalProperty("key.password") ?:
+                        System.getenv("KEY_PASSWORD") ?:
+                        "android"
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
+        }
+        debug {
+            isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
         }
     }
 
