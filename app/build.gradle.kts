@@ -27,12 +27,18 @@ android {
 
     defaultConfig {
         applicationId = "com.prometeo.batterywidget"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 35
         versionCode = 2
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Add build time and SDK info to BuildConfig
+        buildConfigField("String", "BUILD_TIME", "\"${System.currentTimeMillis()}\"")
+        buildConfigField("int", "MIN_SDK_VERSION", "$minSdk")
+        buildConfigField("int", "TARGET_SDK_VERSION", "$targetSdk")
+        buildConfigField("int", "COMPILE_SDK_VERSION", "$compileSdk")
     }
 
     signingConfigs {
@@ -84,6 +90,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
