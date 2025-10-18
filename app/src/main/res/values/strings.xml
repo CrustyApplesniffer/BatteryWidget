@@ -4,7 +4,7 @@
 
     <!-- Button Texts -->
     <string name="configure_widgets">Configure Widgets</string>
-    <string name="open_battery_settings">Battery Settings</string>
+    <string name="battery_settings">Battery Settings</string>
 
     <!-- Android Version Names -->
     <string name="android_1_0">Android 1.0</string>
@@ -53,7 +53,7 @@
     <string name="monitoring_bullet_points">• Always see your current battery level\n• Live updates with accurate percentage\n• No delays or lag in battery information</string>
 
     <string name="visual_design">🎨 Visual Design</string>
-    <string name="design_bullet_points">• Dynamic color coding:\n  - Green (80-100%%): High battery\n  - Light Green (60-79%%): Good battery\n  - Yellow (40-59%%): Medium battery\n  - Orange (20-39%%): Low battery\n  - Red (0-19%%): Critical battery\n• Clean, minimalist design\n• Smooth progress bar animation</string>
+    <string name="design_bullet_points">• Dynamic color coding:\n  &#8211; Green (80&#8211;100%%): High battery\n  &#8211; Light Green (60&#8211;79%%): Good battery\n  &#8211; Yellow (40&#8211;59%%): Medium battery\n  &#8211; Orange (20&#8211;39%%): Low battery\n  &#8211; Red (0&#8211;19%%): Critical battery\n• Clean, minimalist design\n• Smooth progress bar animation</string>
 
     <string name="smart_functionality">⚡ Smart Functionality</string>
     <string name="functionality_bullet_points">• Charging status indicator (flash icon)\n• Auto-updates when battery changes\n• Manual refresh intervals available\n• Tap widget to open battery settings</string>
@@ -93,4 +93,14 @@
     <string name="need_help">Need Help?\nIf you encounter any issues or have suggestions for improvement, please contact us through the app store listing.</string>
 
     <string name="thank_you">Thank you for choosing Battery Widget! We hope this app helps you better monitor and manage your device\'s battery life.</string>
+    <string name="configure_default_text">Configure default settings for new widgets:\n\nThese settings will be applied to new widgets when they are first created.</string>
+    <string name="save_default_settings">Save Default Settings</string>
+
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="refresh_interval">Refresh Interval</string>
+    <string name="instructions">Instructions</string>
+    <string name="battery_widget_settings">Battery Widget Settings</string>
+    <string name="apply_to_all_widgets">Apply to all widgets</string>
+
 </resources>

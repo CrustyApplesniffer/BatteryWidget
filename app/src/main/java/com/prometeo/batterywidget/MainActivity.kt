@@ -1,11 +1,11 @@
 package com.prometeo.batterywidget
 
 import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.prometeo.batterywidget.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
             val buildTime = BuildConfig.BUILD_TIME.toLong()
             val dateFormat = SimpleDateFormat("MMMM dd, yyyy 'at' HH:mm", Locale.getDefault())
             dateFormat.format(Date(buildTime))
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
             dateFormat.format(Date())
         }
@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
     private fun getMinSdkVersion(): Int {
         return try {
             BuildConfig.MIN_SDK_VERSION
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Fallback
             Build.VERSION_CODES.LOLLIPOP
         }
@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity() {
     private fun getTargetSdkVersion(): Int {
         return try {
             BuildConfig.TARGET_SDK_VERSION
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Build.VERSION.SDK_INT
         }
     }
@@ -174,7 +174,7 @@ class MainActivity : AppCompatActivity() {
     private fun getCompileSdkVersion(): Int {
         return try {
             BuildConfig.COMPILE_SDK_VERSION
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             34 // Fallback to your actual compileSdk
         }
     }
@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Open Battery Settings Button - Opens system battery settings
-        binding.btnBatterySettings.text = getString(R.string.open_battery_settings)
+        binding.btnBatterySettings.text = getString(R.string.battery_settings)
         binding.btnBatterySettings.setOnClickListener {
             openBatterySettings()
         }
@@ -269,20 +269,20 @@ class MainActivity : AppCompatActivity() {
             // Primary option: Battery saver settings (Android 5.0+)
             val intent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
             startActivity(intent)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             try {
                 // Fallback 1: Power usage settings
                 val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
                 startActivity(intent)
-            } catch (e2: Exception) {
+            } catch (_: Exception) {
                 try {
                     // Fallback 2: General settings
                     val intent = Intent(Settings.ACTION_SETTINGS)
                     startActivity(intent)
-                } catch (e3: Exception) {
+                } catch (_: Exception) {
                     // Final fallback: Open app info
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    intent.data = Uri.parse("package:$packageName")
+                    intent.data = "package:$packageName".toUri()
                     startActivity(intent)
                 }
             }

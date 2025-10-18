@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="?android:attr/colorBackground">
+    android:background="?android:attr/colorBackground"
+    android:fitsSystemWindows="true">
 
     <!-- Scrollable Text Area -->
     <ScrollView
@@ -57,7 +58,7 @@
             android:id="@+id/btnBatterySettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/open_battery_settings"
+            android:text="@string/battery_settings"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:backgroundTint="?attr/colorSecondary" />
