@@ -21,10 +21,16 @@
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:gravity="start"
+            android:textAlignment="viewStart"
+            android:textIsSelectable="true"
+            android:autoLink="all"
+            android:textStyle="normal"
             android:lineSpacingExtra="8dp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:padding="8dp" />
+            android:padding="16dp"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="insideInset"
+            android:textColor="?android:attr/textColorPrimary" />
 
     </ScrollView>
 
@@ -40,7 +46,7 @@
             android:id="@+id/btnConfigureWidgets"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Configure Widgets"
+            android:text="@string/configure_widgets"
             android:layout_marginBottom="16dp"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
@@ -51,7 +57,7 @@
             android:id="@+id/btnBatterySettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Open Battery Settings"
+            android:text="@string/open_battery_settings"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:backgroundTint="?attr/colorSecondary" />
