@@ -23,6 +23,12 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Restore keystore
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+
       - name: Assemble Release
         run: ./gradlew assembleRelease
 
