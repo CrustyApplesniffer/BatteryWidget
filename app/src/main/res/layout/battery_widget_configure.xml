@@ -10,7 +10,7 @@
         android:id="@+id/textViewTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Battery Widget Settings"
+        android:text="@string/battery_widget_settings"
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -21,7 +21,7 @@
         android:id="@+id/textViewInstructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Instructions"
+        android:text="@string/instructions"
         android:textSize="14sp"
         android:textColor="?android:attr/textColorSecondary"
         android:layout_marginBottom="16dp"
@@ -30,7 +30,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Refresh Interval:"
+        android:text="@string/refresh_interval"
         android:textSize="16sp"
         android:textColor="?android:attr/textColorPrimary"
         android:layout_marginBottom="8dp" />
@@ -52,7 +52,7 @@
             android:id="@+id/btn_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cancel"
+            android:text="@string/cancel"
             android:layout_marginEnd="8dp"
             android:backgroundTint="?attr/colorSecondary" />
 
@@ -60,7 +60,7 @@
             android:id="@+id/btn_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save"
+            android:text="@string/save"
             android:backgroundTint="?attr/colorPrimary" />
 
     </LinearLayout>
@@ -70,7 +70,7 @@
         android:id="@+id/btn_apply_to_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Apply to All Widgets"
+        android:text="@string/apply_to_all_widgets"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:backgroundTint="?attr/colorPrimary"

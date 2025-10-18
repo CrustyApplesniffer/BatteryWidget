@@ -3,7 +3,7 @@
     <string name="app_name">Batterie Widget</string>
     <!-- Button Texts -->
     <string name="configure_widgets">Configurer les widgets</string>
-    <string name="open_battery_settings">Paramètres batterie</string>
+    <string name="battery_settings">Paramètres batterie</string>
 
     <!-- Android Version Names -->
     <string name="android_1_0">Android 1.0</string>
@@ -52,7 +52,7 @@
     <string name="monitoring_bullet_points">• Voir toujours votre niveau de batterie actuel\n• Mises à jour en direct avec pourcentage précis\n• Pas de délais ni de latence dans les informations sur la batterie</string>
 
     <string name="visual_design">🎨 Design visuel</string>
-    <string name="design_bullet_points">• Codage couleur dynamique :\n  – Vert (80–100%%) : Batterie élevée\n  – Vert clair (60–79%%) : Bonne batterie\n  – Jaune (40–59%%) : Batterie moyenne\n  – Orange (20-39%%) : Batterie faible\n  - Rouge (0-19%%) : Batterie critique\n• Design propre et minimaliste\n• Animation fluide de la barre de progression</string>
+    <string name="design_bullet_points">• Codage couleur dynamique :\n  &#8211; Vert (80&#8211;100%%) : Batterie élevée\n  &#8211; Vert clair (60&#8211;79%%) : Bonne batterie\n  &#8211; Jaune (40&#8211;59%%) : Batterie moyenne\n  &#8211; Orange (20&#8211;39%%) : Batterie faible\n  &#8211; Rouge (0&#8211;19%%) : Batterie critique\n• Design propre et minimaliste\n• Animation fluide de la barre de progression</string>
 
     <string name="smart_functionality">⚡ Fonctionnalités intelligentes</string>
     <string name="functionality_bullet_points">• Indicateur d\'état de charge (icône éclair)\n• Mises à jour automatiques lors des changements de batterie\n• Intervalles de rafraîchissement manuel disponibles\n• Appuyez sur le widget pour ouvrir les paramètres batterie</string>
@@ -92,4 +92,14 @@
     <string name="need_help">Besoin d\'aide ?\nSi vous rencontrez des problèmes ou avez des suggestions d\'amélioration, veuillez nous contacter via la fiche de l\'application sur le store.</string>
 
     <string name="thank_you">Merci d\'avoir choisi Widget Batterie ! Nous espérons que cette application vous aide à mieux surveiller et gérer la durée de vie de la batterie de votre appareil.</string>
+    <string name="configure_default_text">Configurer les paramètres par défaut pour les nouveaux widgets:\nCes paramètres seront appliqués aux nouveaux widgets lors de leur création.</string>
+    <string name="save_default_settings">Sauvegarder les paramètres par défaut</string>
+
+    <string name="save">Sauvegarder</string>
+    <string name="cancel">Annuler</string>
+    <string name="refresh_interval">Intervalle de rafraîchissement</string>
+    <string name="instructions">Instructions</string>
+    <string name="battery_widget_settings">Paramètres du widget batterie</string>
+    <string name="apply_to_all_widgets">Appliquer à tous les widgets</string>
+
 </resources>

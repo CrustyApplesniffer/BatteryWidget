@@ -42,7 +42,7 @@ class BatteryMonitorService : Service() {
                     val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
 
                     appWidgetIds.forEach { appWidgetId ->
-                        val prefs = context.getSharedPreferences("BatteryWidgetPrefs", Context.MODE_PRIVATE)
+                        val prefs = context.getSharedPreferences("BatteryWidgetPrefs", MODE_PRIVATE)
                         val refreshInterval = prefs.getInt("refresh_interval_$appWidgetId", BatteryWidgetProvider.REFRESH_AUTO)
 
                         // Only update widgets in AUTO mode
