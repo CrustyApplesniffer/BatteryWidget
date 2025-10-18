@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
 /**
  * Main Activity for Battery Widget App
  *
@@ -55,94 +54,93 @@ class MainActivity : AppCompatActivity() {
         val targetSdk = getTargetSdkVersion()
         val compileSdk = getCompileSdkVersion()
 
+        return getFormattedAppInfoText(
+            versionName = versionName,
+            versionCode = versionCode.toString(),
+            minSdkName = getAndroidVersionName(minSdk),
+            minSdkCode = minSdk.toString(),
+            targetSdkName = getAndroidVersionName(targetSdk),
+            targetSdkCode = targetSdk.toString(),
+            compileSdkName = getAndroidVersionName(compileSdk),
+            compileSdkCode = compileSdk.toString(),
+            buildDate = buildDate,
+            currentSdkName = getAndroidVersionName(Build.VERSION.SDK_INT),
+            currentSdkCode = Build.VERSION.SDK_INT.toString(),
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL
+        )
+    }
+
+    private fun getFormattedAppInfoText(
+        versionName: String?,
+        versionCode: String,
+        minSdkName: String,
+        minSdkCode: String,
+        targetSdkName: String,
+        targetSdkCode: String,
+        compileSdkName: String,
+        compileSdkCode: String,
+        buildDate: String,
+        currentSdkName: String,
+        currentSdkCode: String,
+        manufacturer: String,
+        model: String
+    ): String {
         return """
-            Battery Widget - Complete Guide
-            
-            Welcome to Battery Widget! This app provides a beautiful, functional battery monitoring widget for your home screen.
-
-            📊 Features Overview:
-
-            Real-time Monitoring
-            • Always see your current battery level
-            • Live updates with accurate percentage
-            • No delays or lag in battery information
-
-            🎨 Visual Design
-            • Dynamic color coding:
-              - Green (80-100%): High battery
-              - Light Green (60-79%): Good battery  
-              - Yellow (40-59%): Medium battery
-              - Orange (20-39%): Low battery
-              - Red (0-19%): Critical battery
-            • Clean, minimalist design
-            • Smooth progress bar animation
-
-            ⚡ Smart Functionality
-            • Charging status indicator (flash icon)
-            • Auto-updates when battery changes
-            • Manual refresh intervals available
-            • Tap widget to open battery settings
-
-            ⚙️ Configuration Options
-            • Auto Mode: Updates on battery changes
-            • 30 Seconds: Frequent updates
-            • 1 Minute: Balanced updates
-            • 15 Minutes: Less frequent updates
-            • 30 Minutes: Power-saving updates
-
-            🏠 Installation & Usage
-
-            Adding the Widget:
-            1. Long-press on your home screen
-            2. Select "Widgets" from the menu
-            3. Scroll to find "Battery Widget"
-            4. Drag and drop to your desired location
-            5. The widget will automatically start working
-
-            Configuring the Widget:
-            • Tap the widget to open configuration
-            • Choose your preferred update interval
-            • Settings are saved automatically
-
-            🔋 Battery Settings Access
-            One tap on the widget opens your device's battery settings, where you can:
-            • View detailed battery usage
-            • Enable battery saver mode
-            • Check which apps use most power
-            • Optimize battery settings
-
-            🔒 Privacy & Permissions
-            • No internet connection required
-            • No personal data collection
-            • Only reads battery level and charging status
-            • All data stays on your device
-            • No ads or tracking
-
-            📱 App Information
-            
-            Version Information:
-            • App Version: $versionName (Build $versionCode)
-            • Minimum Android: ${getAndroidVersionName(minSdk)} (API $minSdk)
-            • Target Android: ${getAndroidVersionName(targetSdk)} (API $targetSdk)
-            • Compiled with Android SDK: ${getAndroidVersionName(compileSdk)} (API $compileSdk)
-            • Last Updated: $buildDate
-
-            Device Information:
-            • Current Android: ${getAndroidVersionName(Build.VERSION.SDK_INT)} (API ${Build.VERSION.SDK_INT})
-            • Device: ${Build.MANUFACTURER} ${Build.MODEL}
-
-            ❓ Troubleshooting
-
-            Common Issues:
-            • Widget not updating: Check refresh interval settings
-            • Wrong battery level: Restart the widget or device
-            • Charging icon not showing: Replug charger or check connection
-
-            Need Help?
-            If you encounter any issues or have suggestions for improvement, please contact us through the app store listing.
-
-            Thank you for choosing Battery Widget! We hope this app helps you better monitor and manage your device's battery life.
-        """.trimIndent()
+        |${getString(R.string.app_title)}
+        |
+        |${getString(R.string.app_welcome)}
+        |
+        |${getString(R.string.features_title)}
+        |
+        |${getString(R.string.real_time_monitoring)}
+        |${getString(R.string.monitoring_bullet_points)}
+        |
+        |${getString(R.string.visual_design)}
+        |${getString(R.string.design_bullet_points)}
+        |
+        |${getString(R.string.smart_functionality)}
+        |${getString(R.string.functionality_bullet_points)}
+        |
+        |${getString(R.string.configuration_options)}
+        |${getString(R.string.configuration_bullet_points)}
+        |
+        |${getString(R.string.installation_usage)}
+        |
+        |${getString(R.string.adding_widget)}
+        |${getString(R.string.widget_steps)}
+        |
+        |${getString(R.string.configuring_widget)}
+        |${getString(R.string.configuration_tips)}
+        |
+        |${getString(R.string.battery_settings_access)}
+        |${getString(R.string.settings_options)}
+        |
+        |${getString(R.string.privacy_permissions)}
+        |${getString(R.string.privacy_points)}
+        |
+        |${getString(R.string.app_information)}
+        |
+        |${getString(R.string.version_info)}
+        |${getString(R.string.app_version, versionName, versionCode)}
+        |${getString(R.string.min_android, minSdkName, minSdkCode)}
+        |${getString(R.string.target_android, targetSdkName, targetSdkCode)}
+        |${getString(R.string.compile_sdk, compileSdkName, compileSdkCode)}
+        |${getString(R.string.last_updated, buildDate)}
+        |
+        |${getString(R.string.device_info)}
+        |${getString(R.string.current_android, currentSdkName, currentSdkCode)}
+        |${getString(R.string.device_model, manufacturer, model)}
+        |
+        |${getString(R.string.troubleshooting)}
+        |
+        |${getString(R.string.common_issues)}
+        |${getString(R.string.issues_list)}
+        |
+        |${getString(R.string.need_help)}
+        |
+        |${getString(R.string.thank_you)}
+    """.trimMargin()
     }
 
     private fun getBuildDate(): String {
@@ -183,50 +181,49 @@ class MainActivity : AppCompatActivity() {
 
     private fun getAndroidVersionName(apiLevel: Int): String {
         return when (apiLevel) {
-            Build.VERSION_CODES.BASE -> "Android 1.0"
-            Build.VERSION_CODES.BASE_1_1 -> "Android 1.1"
-            Build.VERSION_CODES.CUPCAKE -> "Android 1.5 (Cupcake)"
-            Build.VERSION_CODES.DONUT -> "Android 1.6 (Donut)"
-            Build.VERSION_CODES.ECLAIR -> "Android 2.0 (Eclair)"
-            Build.VERSION_CODES.ECLAIR_0_1 -> "Android 2.0.1 (Eclair)"
-            Build.VERSION_CODES.ECLAIR_MR1 -> "Android 2.1 (Eclair)"
-            Build.VERSION_CODES.FROYO -> "Android 2.2 (Froyo)"
-            Build.VERSION_CODES.GINGERBREAD -> "Android 2.3 (Gingerbread)"
-            Build.VERSION_CODES.GINGERBREAD_MR1 -> "Android 2.3.3 (Gingerbread)"
-            Build.VERSION_CODES.HONEYCOMB -> "Android 3.0 (Honeycomb)"
-            Build.VERSION_CODES.HONEYCOMB_MR1 -> "Android 3.1 (Honeycomb)"
-            Build.VERSION_CODES.HONEYCOMB_MR2 -> "Android 3.2 (Honeycomb)"
-            Build.VERSION_CODES.ICE_CREAM_SANDWICH -> "Android 4.0 (Ice Cream Sandwich)"
-            Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1 -> "Android 4.0.3 (Ice Cream Sandwich)"
-            Build.VERSION_CODES.JELLY_BEAN -> "Android 4.1 (Jelly Bean)"
-            Build.VERSION_CODES.JELLY_BEAN_MR1 -> "Android 4.2 (Jelly Bean)"
-            Build.VERSION_CODES.JELLY_BEAN_MR2 -> "Android 4.3 (Jelly Bean)"
-            Build.VERSION_CODES.KITKAT -> "Android 4.4 (KitKat)"
-            Build.VERSION_CODES.KITKAT_WATCH -> "Android 4.4W (KitKat Wear)"
-            Build.VERSION_CODES.LOLLIPOP -> "Android 5.0 (Lollipop)"
-            Build.VERSION_CODES.LOLLIPOP_MR1 -> "Android 5.1 (Lollipop)"
-            Build.VERSION_CODES.M -> "Android 6.0 (Marshmallow)"
-            Build.VERSION_CODES.N -> "Android 7.0 (Nougat)"
-            Build.VERSION_CODES.N_MR1 -> "Android 7.1 (Nougat)"
-            Build.VERSION_CODES.O -> "Android 8.0 (Oreo)"
-            Build.VERSION_CODES.O_MR1 -> "Android 8.1 (Oreo)"
-            Build.VERSION_CODES.P -> "Android 9.0 (Pie)"
-            Build.VERSION_CODES.Q -> "Android 10"
-            Build.VERSION_CODES.R -> "Android 11"
-            Build.VERSION_CODES.S -> "Android 12"
-            Build.VERSION_CODES.S_V2 -> "Android 12L"
-            Build.VERSION_CODES.TIRAMISU -> "Android 13"
-            Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> "Android 14"
+            Build.VERSION_CODES.BASE -> getString(R.string.android_1_0)
+            Build.VERSION_CODES.BASE_1_1 -> getString(R.string.android_1_1)
+            Build.VERSION_CODES.CUPCAKE -> getString(R.string.android_1_5_cupcake)
+            Build.VERSION_CODES.DONUT -> getString(R.string.android_1_6_donut)
+            Build.VERSION_CODES.ECLAIR -> getString(R.string.android_2_0_eclair)
+            Build.VERSION_CODES.ECLAIR_0_1 -> getString(R.string.android_2_0_1_eclair)
+            Build.VERSION_CODES.ECLAIR_MR1 -> getString(R.string.android_2_1_eclair)
+            Build.VERSION_CODES.FROYO -> getString(R.string.android_2_2_froyo)
+            Build.VERSION_CODES.GINGERBREAD -> getString(R.string.android_2_3_gingerbread)
+            Build.VERSION_CODES.GINGERBREAD_MR1 -> getString(R.string.android_2_3_3_gingerbread)
+            Build.VERSION_CODES.HONEYCOMB -> getString(R.string.android_3_0_honeycomb)
+            Build.VERSION_CODES.HONEYCOMB_MR1 -> getString(R.string.android_3_1_honeycomb)
+            Build.VERSION_CODES.HONEYCOMB_MR2 -> getString(R.string.android_3_2_honeycomb)
+            Build.VERSION_CODES.ICE_CREAM_SANDWICH -> getString(R.string.android_4_0_ice_cream_sandwich)
+            Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1 -> getString(R.string.android_4_0_3_ice_cream_sandwich)
+            Build.VERSION_CODES.JELLY_BEAN -> getString(R.string.android_4_1_jelly_bean)
+            Build.VERSION_CODES.JELLY_BEAN_MR1 -> getString(R.string.android_4_2_jelly_bean)
+            Build.VERSION_CODES.JELLY_BEAN_MR2 -> getString(R.string.android_4_3_jelly_bean)
+            Build.VERSION_CODES.KITKAT -> getString(R.string.android_4_4_kitkat)
+            Build.VERSION_CODES.KITKAT_WATCH -> getString(R.string.android_4_4w_kitkat_wear)
+            Build.VERSION_CODES.LOLLIPOP -> getString(R.string.android_5_0_lollipop)
+            Build.VERSION_CODES.LOLLIPOP_MR1 -> getString(R.string.android_5_1_lollipop)
+            Build.VERSION_CODES.M -> getString(R.string.android_6_0_marshmallow)
+            Build.VERSION_CODES.N -> getString(R.string.android_7_0_nougat)
+            Build.VERSION_CODES.N_MR1 -> getString(R.string.android_7_1_nougat)
+            Build.VERSION_CODES.O -> getString(R.string.android_8_0_oreo)
+            Build.VERSION_CODES.O_MR1 -> getString(R.string.android_8_1_oreo)
+            Build.VERSION_CODES.P -> getString(R.string.android_9_0_pie)
+            Build.VERSION_CODES.Q -> getString(R.string.android_10)
+            Build.VERSION_CODES.R -> getString(R.string.android_11)
+            Build.VERSION_CODES.S -> getString(R.string.android_12)
+            Build.VERSION_CODES.S_V2 -> getString(R.string.android_12l)
+            Build.VERSION_CODES.TIRAMISU -> getString(R.string.android_13)
+            Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> getString(R.string.android_14)
             else -> {
                 if (apiLevel > Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    "Android ${apiLevel} (Future Version)"
+                    getString(R.string.android_future_version, apiLevel.toString())
                 } else {
-                    "Android (API $apiLevel)"
+                    getString(R.string.android_api_level, apiLevel.toString())
                 }
             }
         }
     }
-
 
     // =========================================================================
     // Button Setup Methods
@@ -237,11 +234,13 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupButtons() {
         // Configure Widgets Button - Opens configuration activity
+        binding.btnConfigureWidgets.text = getString(R.string.configure_widgets)
         binding.btnConfigureWidgets.setOnClickListener {
             openConfigurationActivity()
         }
 
         // Open Battery Settings Button - Opens system battery settings
+        binding.btnBatterySettings.text = getString(R.string.open_battery_settings)
         binding.btnBatterySettings.setOnClickListener {
             openBatterySettings()
         }

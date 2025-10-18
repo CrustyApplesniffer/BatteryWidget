@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Batterie Widget</string>
+    <!-- Button Texts -->
+    <string name="configure_widgets">Configurer les widgets</string>
+    <string name="open_battery_settings">Paramètres batterie</string>
+
+    <!-- Android Version Names -->
+    <string name="android_1_0">Android 1.0</string>
+    <string name="android_1_1">Android 1.1</string>
+    <string name="android_1_5_cupcake">Android 1.5 (Cupcake)</string>
+    <string name="android_1_6_donut">Android 1.6 (Donut)</string>
+    <string name="android_2_0_eclair">Android 2.0 (Eclair)</string>
+    <string name="android_2_0_1_eclair">Android 2.0.1 (Eclair)</string>
+    <string name="android_2_1_eclair">Android 2.1 (Eclair)</string>
+    <string name="android_2_2_froyo">Android 2.2 (Froyo)</string>
+    <string name="android_2_3_gingerbread">Android 2.3 (Gingerbread)</string>
+    <string name="android_2_3_3_gingerbread">Android 2.3.3 (Gingerbread)</string>
+    <string name="android_3_0_honeycomb">Android 3.0 (Honeycomb)</string>
+    <string name="android_3_1_honeycomb">Android 3.1 (Honeycomb)</string>
+    <string name="android_3_2_honeycomb">Android 3.2 (Honeycomb)</string>
+    <string name="android_4_0_ice_cream_sandwich">Android 4.0 (Ice Cream Sandwich)</string>
+    <string name="android_4_0_3_ice_cream_sandwich">Android 4.0.3 (Ice Cream Sandwich)</string>
+    <string name="android_4_1_jelly_bean">Android 4.1 (Jelly Bean)</string>
+    <string name="android_4_2_jelly_bean">Android 4.2 (Jelly Bean)</string>
+    <string name="android_4_3_jelly_bean">Android 4.3 (Jelly Bean)</string>
+    <string name="android_4_4_kitkat">Android 4.4 (KitKat)</string>
+    <string name="android_4_4w_kitkat_wear">Android 4.4W (KitKat Wear)</string>
+    <string name="android_5_0_lollipop">Android 5.0 (Lollipop)</string>
+    <string name="android_5_1_lollipop">Android 5.1 (Lollipop)</string>
+    <string name="android_6_0_marshmallow">Android 6.0 (Marshmallow)</string>
+    <string name="android_7_0_nougat">Android 7.0 (Nougat)</string>
+    <string name="android_7_1_nougat">Android 7.1 (Nougat)</string>
+    <string name="android_8_0_oreo">Android 8.0 (Oreo)</string>
+    <string name="android_8_1_oreo">Android 8.1 (Oreo)</string>
+    <string name="android_9_0_pie">Android 9.0 (Pie)</string>
+    <string name="android_10">Android 10</string>
+    <string name="android_11">Android 11</string>
+    <string name="android_12">Android 12</string>
+    <string name="android_12l">Android 12L</string>
+    <string name="android_13">Android 13</string>
+    <string name="android_14">Android 14</string>
+    <string name="android_future_version">Android %s (Version future)</string>
+    <string name="android_api_level">Android (API %s)</string>
+
+    <!-- App Info Text Sections -->
+    <string name="app_title">Widget Batterie - Guide Complet</string>
+    <string name="app_welcome">Bienvenue dans Widget Batterie ! Cette application fournit un widget beau et fonctionnel pour surveiller la batterie sur votre écran d\'accueil.</string>
+
+    <string name="features_title">📊 Aperçu des fonctionnalités :</string>
+    <string name="real_time_monitoring">Surveillance en temps réel</string>
+    <string name="monitoring_bullet_points">• Voir toujours votre niveau de batterie actuel\n• Mises à jour en direct avec pourcentage précis\n• Pas de délais ni de latence dans les informations sur la batterie</string>
+
+    <string name="visual_design">🎨 Design visuel</string>
+    <string name="design_bullet_points">• Codage couleur dynamique :\n  – Vert (80–100%%) : Batterie élevée\n  – Vert clair (60–79%%) : Bonne batterie\n  – Jaune (40–59%%) : Batterie moyenne\n  – Orange (20-39%%) : Batterie faible\n  - Rouge (0-19%%) : Batterie critique\n• Design propre et minimaliste\n• Animation fluide de la barre de progression</string>
+
+    <string name="smart_functionality">⚡ Fonctionnalités intelligentes</string>
+    <string name="functionality_bullet_points">• Indicateur d\'état de charge (icône éclair)\n• Mises à jour automatiques lors des changements de batterie\n• Intervalles de rafraîchissement manuel disponibles\n• Appuyez sur le widget pour ouvrir les paramètres batterie</string>
+
+    <string name="configuration_options">⚙️ Options de configuration</string>
+    <string name="configuration_bullet_points">• Mode Auto : Mises à jour sur les changements de batterie\n• 30 Secondes : Mises à jour fréquentes\n• 1 Minute : Mises à jour équilibrées\n• 15 Minutes : Mises à jour moins fréquentes\n• 30 Minutes : Mises à jour économes en énergie</string>
+
+    <string name="installation_usage">🏠 Installation &amp; Utilisation</string>
+    <string name="adding_widget">Ajouter le Widget :</string>
+    <string name="widget_steps">1. Appuyez longuement sur votre écran d\'accueil\n2. Sélectionnez \"Widgets\" dans le menu\n3. Faites défiler pour trouver \"Widget Batterie\"\n4. Glissez et déposez à l\'emplacement souhaité\n5. Le widget commencera automatiquement à fonctionner</string>
+
+    <string name="configuring_widget">Configurer le Widget :</string>
+    <string name="configuration_tips">• Appuyez sur le widget pour ouvrir la configuration\n• Choisissez votre intervalle de mise à jour préféré\n• Les paramètres sont sauvegardés automatiquement</string>
+
+    <string name="battery_settings_access">🔋 Accès aux paramètres batterie</string>
+    <string name="settings_options">Un appui sur le widget ouvre les paramètres batterie de votre appareil, où vous pouvez :\n• Voir l\'utilisation détaillée de la batterie\n• Activer le mode économie d\'énergie\n• Vérifier quelles applications utilisent le plus d\'énergie\n• Optimiser les paramètres batterie</string>
+
+    <string name="privacy_permissions">🔒 Confidentialité &amp; Permissions</string>
+    <string name="privacy_points">• Aucune connexion Internet requise\n• Aucune collecte de données personnelles\n• Lit uniquement le niveau de batterie et l\'état de charge\n• Toutes les données restent sur votre appareil\n• Pas de publicités ni de suivi</string>
+
+    <string name="app_information">📱 Informations sur l\'application</string>
+    <string name="version_info">Informations de version :</string>
+    <string name="app_version">• Version de l\'app : %1$s (Build %2$s)</string>
+    <string name="min_android">• Android minimum : %1$s (API %2$s)</string>
+    <string name="target_android">• Android cible : %1$s (API %2$s)</string>
+    <string name="compile_sdk">• Compilé avec SDK Android : %1$s (API %2$s)</string>
+    <string name="last_updated">• Dernière mise à jour : %s</string>
+
+    <string name="device_info">Informations sur l\'appareil :</string>
+    <string name="current_android">• Android actuel : %1$s (API %2$s)</string>
+    <string name="device_model">• Appareil : %1$s %2$s</string>
+
+    <string name="troubleshooting">❓ Dépannage</string>
+    <string name="common_issues">Problèmes courants :</string>
+    <string name="issues_list">• Widget ne se met pas à jour : Vérifiez les paramètres d\'intervalle de rafraîchissement\n• Niveau de batterie incorrect : Redémarrez le widget ou l\'appareil\n• Icône de charge non affichée : Rebranchez le chargeur ou vérifiez la connexion</string>
+
+    <string name="need_help">Besoin d\'aide ?\nSi vous rencontrez des problèmes ou avez des suggestions d\'amélioration, veuillez nous contacter via la fiche de l\'application sur le store.</string>
+
+    <string name="thank_you">Merci d\'avoir choisi Widget Batterie ! Nous espérons que cette application vous aide à mieux surveiller et gérer la durée de vie de la batterie de votre appareil.</string>
+</resources>
