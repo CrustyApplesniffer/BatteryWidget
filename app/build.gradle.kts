@@ -43,11 +43,13 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(
-                getLocalProperty("keystore.file") ?:
-                System.getenv("KEYSTORE_FILE") ?:
-                "debug.keystore"
-            )
+            // storeFile:  keystore local file OR provided by CI OR debug.keystore
+            val keystorePath = getLocalProperty("keystore.file")
+                ?: System.getenv("KEYSTORE_FILE")
+                ?: "debug.keystore"
+
+            storeFile = file(keystorePath)
+
             storePassword =
                 getLocalProperty("keystore.password") ?:
                         System.getenv("KEYSTORE_PASSWORD") ?:
@@ -60,6 +62,9 @@ android {
                 getLocalProperty("key.password") ?:
                         System.getenv("KEY_PASSWORD") ?:
                         "android"
+
+            // Optional: useful in CI to avoid crashing if the keystore is missing
+            enableV2Signing = true
         }
     }
 

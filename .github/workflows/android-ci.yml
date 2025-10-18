@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'   # adapte selon ta version
+          java-version: '17'
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -26,7 +26,7 @@ jobs:
       - name: Restore keystore
         run: |
           if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
-            echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > keystore.jks
+            echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/keystore.jks
           fi
 
       - name: Export signing env variables
