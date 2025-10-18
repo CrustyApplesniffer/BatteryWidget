@@ -3,8 +3,8 @@ name: Android CI
 on:
   pull_request:
     branches:
-      - main
       - master
+      - develop
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
 
       - name: Set up JDK
         uses: actions/setup-java@v4
