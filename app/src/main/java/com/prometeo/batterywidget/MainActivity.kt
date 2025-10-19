@@ -10,6 +10,11 @@ import com.prometeo.batterywidget.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+
 
 /**
  * Main Activity for Battery Widget App
@@ -30,14 +35,36 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        // 1) We manage the system bars ourselves
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        // Set scrollable text content with real values
+        // 2) Inflate
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        // 3) Define text BEFORE setContentView (avoids warning)
         binding.textView.text = createAppInfoText()
 
+        // 4) Apply view
+        setContentView(binding.root)
+
+        // 5) Apply insets UP AND DOWN
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // Add top AND bottom padding
+            view.updatePadding(
+                top = systemBars.top,
+                bottom = systemBars.bottom
+            )
+
+            insets
+        }
+
+        // 6) Boutons
         setupButtons()
     }
+
+
 
     private fun createAppInfoText(): String {
         val packageInfo = packageManager.getPackageInfo(packageName, 0)
@@ -215,8 +242,10 @@ class MainActivity : AppCompatActivity() {
             Build.VERSION_CODES.S_V2 -> getString(R.string.android_12l)
             Build.VERSION_CODES.TIRAMISU -> getString(R.string.android_13)
             Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> getString(R.string.android_14)
+            Build.VERSION_CODES.VANILLA_ICE_CREAM -> getString(R.string.android_15)
+            Build.VERSION_CODES.BAKLAVA -> getString(R.string.android_16)
             else -> {
-                if (apiLevel > Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                if (apiLevel > Build.VERSION_CODES.BAKLAVA) {
                     getString(R.string.android_future_version, apiLevel.toString())
                 } else {
                     getString(R.string.android_api_level, apiLevel.toString())
