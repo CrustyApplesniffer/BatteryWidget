@@ -84,22 +84,47 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    - name: Run manual build steps
+    # - name: Run manual build steps
+    #   if: matrix.build-mode == 'manual'
+    #   shell: bash
+    #   run: |
+    #     if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
+    #       echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/keystore.jks
+    #     fi        
+    #     echo "KEYSTORE_FILE=app/keystore.jks" >> $GITHUB_ENV
+    #     echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+    #     echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+    #     echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+    #     ./gradlew assembleRelease
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Make gradlew executable
       if: matrix.build-mode == 'manual'
-      shell: bash
+      run: chmod +x ./gradlew
+
+    - name: Restore keystore
+      if: matrix.build-mode == 'manual'
       run: |
-        echo "KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}"
         if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
-          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > keystore.jks
-          mv keystore.jks app/debug.keystore
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/keystore.jks
         fi
-        
-        echo "KEYSTORE_FILE=app/keystore.jks" >> $GITHUB_ENV
+
+    - name: Export signing env variables
+      if: matrix.build-mode == 'manual'
+      run: |
+        echo "KEYSTORE_FILE=keystore.jks" >> $GITHUB_ENV
         echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
         echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
         echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
 
-        ./gradlew assembleRelease
+    - name: Assemble Release
+      if: matrix.build-mode == 'manual'
+      run: ./gradlew assembleRelease
+
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
