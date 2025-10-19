@@ -94,7 +94,7 @@ jobs:
           mv keystore.jks app/.
         fi
         
-        echo "KEYSTORE_FILE=keystore.jks" >> $GITHUB_ENV
+        echo "KEYSTORE_FILE=app/keystore.jks" >> $GITHUB_ENV
         echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
         echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
         echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
