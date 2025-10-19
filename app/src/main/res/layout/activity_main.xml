@@ -1,55 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp"
-    android:background="@android:color/white">
+    android:background="?android:attr/colorBackground"
+    android:fitsSystemWindows="true">
 
-    <LinearLayout
+    <!-- Scrollable Text Area -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
+        android:scrollbarStyle="insideOverlay"
+        android:fillViewport="true">
 
-        <!-- App Information Text -->
         <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:gravity="start"
+            android:textAlignment="viewStart"
+            android:textIsSelectable="true"
+            android:autoLink="all"
+            android:textStyle="normal"
             android:lineSpacingExtra="8dp"
-            android:textColor="@android:color/black"
-            android:layout_marginBottom="24dp" />
+            android:padding="16dp"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="insideInset"
+            android:textColor="?android:attr/textColorPrimary" />
 
-        <!-- Button Container -->
-        <LinearLayout
-            android:layout_width="match_parent"
+    </ScrollView>
+
+    <!-- Fixed Buttons at Bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Configure Widgets Button -->
+        <Button
+            android:id="@+id/btnConfigureWidgets"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:text="@string/configure_widgets"
+            android:layout_marginBottom="16dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:backgroundTint="?attr/colorPrimary" />
 
-            <!-- Configure Widgets Button -->
-            <Button
-                android:id="@+id/btnConfigureWidgets"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Configure Widgets"
-                android:layout_marginBottom="16dp"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                android:backgroundTint="@color/purple_500" />
-
-            <!-- Open Battery Settings Button -->
-            <Button
-                android:id="@+id/btnBatterySettings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Open Battery Settings"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                android:backgroundTint="@color/teal_700" />
-
-        </LinearLayout>
+        <!-- Open Battery Settings Button -->
+        <Button
+            android:id="@+id/btnBatterySettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/battery_settings"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:backgroundTint="?attr/colorSecondary" />
 
     </LinearLayout>
 
-</ScrollView>
+</LinearLayout>

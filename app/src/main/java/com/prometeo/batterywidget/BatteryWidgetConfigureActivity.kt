@@ -69,9 +69,9 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
      * This mode is used when opening from the main activity
      */
     private fun setupInformationalMode() {
-        binding.textViewTitle.text = "Widget Configuration"
+        binding.textViewTitle.text = getString(R.string.configure_widgets)
         binding.textViewInstructions.visibility = android.view.View.VISIBLE
-        binding.textViewInstructions.text = "Configure default settings for new widgets:\n\nThese settings will be applied to new widgets when they are first created."
+        binding.textViewInstructions.text = getString(R.string.configure_default_text)
 
         setupRefreshIntervalSpinner()
         setupButtonsForInformationalMode()
@@ -82,7 +82,7 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
      * This mode is used when configuring an existing widget
      */
     private fun setupConfigurationMode() {
-        binding.textViewTitle.text = "Configure Widget"
+        binding.textViewTitle.text = getString(R.string.configure_widgets)
         binding.textViewInstructions.visibility = android.view.View.GONE
 
         setupRefreshIntervalSpinner()
@@ -141,7 +141,7 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
      */
     private fun setupButtonsForInformationalMode() {
         // Save button - saves default configuration
-        binding.btnSave.text = "Save Default Settings"
+        binding.btnSave.text = getString(R.string.save_default_settings)
         binding.btnSave.setOnClickListener {
             saveDefaultConfiguration()
         }
@@ -160,7 +160,7 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
      */
     private fun setupButtonsForConfigurationMode() {
         // Save button - saves configuration for specific widget
-        binding.btnSave.text = "Save Settings"
+        binding.btnSave.text = getString(R.string.save_default_settings)
         binding.btnSave.setOnClickListener {
             saveConfiguration()
         }

@@ -23,25 +23,33 @@ fun getLocalProperty(key: String): String? {
 
 android {
     namespace = "com.prometeo.batterywidget"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.prometeo.batterywidget"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 35
-        versionCode = 2
+        versionCode = 3
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Add build time and SDK info to BuildConfig
+        buildConfigField("String", "BUILD_TIME", "\"${System.currentTimeMillis()}\"")
+        buildConfigField("int", "MIN_SDK_VERSION", "$minSdk")
+        buildConfigField("int", "TARGET_SDK_VERSION", "$targetSdk")
+        buildConfigField("int", "COMPILE_SDK_VERSION", "$compileSdk")
     }
 
     signingConfigs {
         create("release") {
-            storeFile = file(
-                getLocalProperty("keystore.file") ?:
-                System.getenv("KEYSTORE_FILE") ?:
-                "debug.keystore"
-            )
+            // storeFile:  keystore local file OR provided by CI OR debug.keystore
+            val keystorePath = getLocalProperty("keystore.file")
+                ?: System.getenv("KEYSTORE_FILE")
+                ?: "debug.keystore"
+
+            storeFile = file(keystorePath)
+
             storePassword =
                 getLocalProperty("keystore.password") ?:
                         System.getenv("KEYSTORE_PASSWORD") ?:
@@ -54,6 +62,9 @@ android {
                 getLocalProperty("key.password") ?:
                         System.getenv("KEY_PASSWORD") ?:
                         "android"
+
+            // Optional: useful in CI to avoid crashing if the keystore is missing
+            enableV2Signing = true
         }
     }
 
@@ -84,6 +95,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
