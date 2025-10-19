@@ -3,6 +3,7 @@ package com.prometeo.batterywidget
 import android.app.Service
 import android.appwidget.AppWidgetManager
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -18,39 +19,51 @@ import android.util.Log
  */
 class BatteryMonitorService : Service() {
 
-    // Broadcast receiver for battery-related intents
+    private var lastUpdateTime = 0L
+    private val MIN_UPDATE_INTERVAL = 1000L
+
     private val batteryReceiver = object : BroadcastReceiver() {
-        /**
-         * Called when battery-related broadcasts are received
-         *
-         * @param context The application context
-         * @param intent The received broadcast intent
-         */
         override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                Intent.ACTION_BATTERY_CHANGED,
-                Intent.ACTION_BATTERY_LOW,
-                Intent.ACTION_BATTERY_OKAY,
-                Intent.ACTION_POWER_CONNECTED,
-                Intent.ACTION_POWER_DISCONNECTED -> {
-                    Log.d("BatteryMonitorService", "Battery change detected: ${intent.action}")
+            try {
+                val currentTime = System.currentTimeMillis()
 
-                    // Update all widgets that are set to AUTO mode
-                    val widgetProvider = BatteryWidgetProvider()
-                    val appWidgetManager = AppWidgetManager.getInstance(context)
-                    val thisWidget = android.content.ComponentName(context, BatteryWidgetProvider::class.java)
-                    val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+                // Anti-rebond
+                if (currentTime - lastUpdateTime < MIN_UPDATE_INTERVAL) {
+                    return
+                }
+                lastUpdateTime = currentTime
 
-                    appWidgetIds.forEach { appWidgetId ->
-                        val prefs = context.getSharedPreferences("BatteryWidgetPrefs", MODE_PRIVATE)
-                        val refreshInterval = prefs.getInt("refresh_interval_$appWidgetId", BatteryWidgetProvider.REFRESH_AUTO)
-
-                        // Only update widgets in AUTO mode
-                        if (refreshInterval == BatteryWidgetProvider.REFRESH_AUTO) {
-                            widgetProvider.updateWidget(context, appWidgetManager, appWidgetId)
-                        }
+                when (intent.action) {
+                    Intent.ACTION_BATTERY_CHANGED,
+                    Intent.ACTION_BATTERY_LOW,
+                    Intent.ACTION_BATTERY_OKAY,
+                    Intent.ACTION_POWER_CONNECTED,
+                    Intent.ACTION_POWER_DISCONNECTED -> {
+                        Log.d("BatteryMonitorService", "Battery change: ${intent.action}")
+                        updateWidgetsInAutoMode(context)
                     }
                 }
+            } catch (e: Exception) {
+                Log.e("BatteryMonitorService", "Error in battery receiver", e)
+            }
+        }
+    }
+
+    private fun updateWidgetsInAutoMode(context: Context) {
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val thisWidget = ComponentName(context, BatteryWidgetProvider::class.java)
+        val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+
+        // Créer une seule instance du provider
+        val widgetProvider = BatteryWidgetProvider()
+
+        appWidgetIds.forEach { appWidgetId ->
+            val prefs = context.getSharedPreferences("BatteryWidgetPrefs", MODE_PRIVATE)
+            val refreshInterval = prefs.getInt("refresh_interval_$appWidgetId", BatteryWidgetProvider.REFRESH_AUTO)
+
+            // Only update widgets in AUTO mode
+            if (refreshInterval == BatteryWidgetProvider.REFRESH_AUTO) {
+                widgetProvider.updateWidget(context, appWidgetManager, appWidgetId)
             }
         }
     }
