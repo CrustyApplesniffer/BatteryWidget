@@ -91,7 +91,7 @@ jobs:
         echo "KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}"
         if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
           echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > keystore.jks
-          mv keystore.jks app/.
+          mv keystore.jks app/debug.keystore
         fi
         
         echo "KEYSTORE_FILE=app/keystore.jks" >> $GITHUB_ENV
