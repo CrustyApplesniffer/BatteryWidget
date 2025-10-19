@@ -90,7 +90,7 @@ jobs:
       run: |
         echo "KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}"
         if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
-          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/keystore.jks
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > keystore.jks
         fi
         echo "KEYSTORE_FILE=keystore.jks"
         echo "KEYSTORE_FILE=keystore.jks" >> $GITHUB_ENV
