@@ -98,17 +98,7 @@ jobs:
         echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
         echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
         echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
-        echo "------------ pwd --------------"
-        pwd
-        echo "------------ ls --------------"
-        ls
-        echo "------------ cd app --------------"
-        cd app
-        echo "------------ pwd --------------"
-        pwd
-        echo "------------ ls --------------"
-        ls
-        
+
         ./gradlew assembleRelease
 
     - name: Perform CodeQL Analysis
