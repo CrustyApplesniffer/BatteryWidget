@@ -35,12 +35,14 @@
     <string name="android_8_0_oreo">Android 8.0 (Oreo)</string>
     <string name="android_8_1_oreo">Android 8.1 (Oreo)</string>
     <string name="android_9_0_pie">Android 9.0 (Pie)</string>
-    <string name="android_10">Android 10</string>
-    <string name="android_11">Android 11</string>
-    <string name="android_12">Android 12</string>
-    <string name="android_12l">Android 12L</string>
-    <string name="android_13">Android 13</string>
-    <string name="android_14">Android 14</string>
+    <string name="android_10">Android 10 (Quince Tart)</string>
+    <string name="android_11">Android 11 (Red Velvet Cake)</string>
+    <string name="android_12">Android 12 (Snow Cone)</string>
+    <string name="android_12l">Android 12L (Snow Cone v2)</string>
+    <string name="android_13">Android 13 (Tiramisu)</string>
+    <string name="android_14">Android 14 (Upside Down Cake)</string>
+    <string name="android_15">Android 15 (Vanilla Ice Cream)</string>
+    <string name="android_16">Android 16 (Baklava)</string>
     <string name="android_future_version">Android %s (Future Version)</string>
     <string name="android_api_level">Android (API %s)</string>
 

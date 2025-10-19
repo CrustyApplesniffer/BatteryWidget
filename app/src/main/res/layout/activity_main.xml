@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="?android:attr/colorBackground"
-    android:fitsSystemWindows="true">
+    android:background="?android:attr/colorBackground">
 
-    <!-- Scrollable Text Area -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.Material3.ActionBar"
+        app:title="@string/app_name" />
+
+    <!-- Zone Scrollable -->
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginBottom="16dp"
+        android:fillViewport="true"
         android:scrollbars="vertical"
-        android:fadeScrollbars="false"
-        android:scrollbarStyle="insideOverlay"
-        android:fillViewport="true">
+        android:fadeScrollbars="false">
 
         <TextView
             android:id="@+id/textView"
@@ -29,20 +38,17 @@
             android:textStyle="normal"
             android:lineSpacingExtra="8dp"
             android:padding="16dp"
-            android:scrollbars="vertical"
-            android:scrollbarStyle="insideInset"
             android:textColor="?android:attr/textColorPrimary" />
 
     </ScrollView>
 
-    <!-- Fixed Buttons at Bottom -->
+    <!-- Boutons en bas -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center">
 
-        <!-- Configure Widgets Button -->
         <Button
             android:id="@+id/btnConfigureWidgets"
             android:layout_width="wrap_content"
@@ -53,7 +59,6 @@
             android:paddingEnd="24dp"
             android:backgroundTint="?attr/colorPrimary" />
 
-        <!-- Open Battery Settings Button -->
         <Button
             android:id="@+id/btnBatterySettings"
             android:layout_width="wrap_content"
@@ -62,7 +67,6 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:backgroundTint="?attr/colorSecondary" />
-
     </LinearLayout>
 
 </LinearLayout>
