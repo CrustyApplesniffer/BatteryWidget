@@ -278,5 +278,6 @@ If you encounter build issues:
 
 ---
 
-**Last Updated**: {{current_date}}  
+**Last Updated**: 2025-10-20  
+
 **Maintainer**: Crusty Applesniffer
