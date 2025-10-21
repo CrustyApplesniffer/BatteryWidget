@@ -44,7 +44,7 @@ jobs:
           echo "New versionCode: $NEW_VERSION_CODE"
           
           # Update build.gradle.kts with new versionCode
-          sed -i "s/versionCode $CURRENT_VERSION_CODE/versionCode = $NEW_VERSION_CODE/" app/build.gradle.kts
+          sed -i "s/versionCode = $CURRENT_VERSION_CODE/versionCode = $NEW_VERSION_CODE/" app/build.gradle.kts
           
           # Set outputs for later steps
           echo "new_version_code=$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
@@ -87,4 +87,5 @@ jobs:
           track: internal
 
           status: completed
+
 
