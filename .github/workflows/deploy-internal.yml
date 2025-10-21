@@ -58,7 +58,20 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-        
+
+      - name: Restore keystore
+        run: |
+          if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
+            echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/keystore.jks
+          fi
+  
+      - name: Export signing env variables
+        run: |
+          echo "KEYSTORE_FILE=keystore.jks" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+         
       - name: Build Android App Bundle
         run: |
           ./gradlew :app:bundleRelease
@@ -87,5 +100,6 @@ jobs:
           track: internal
 
           status: completed
+
 
 
