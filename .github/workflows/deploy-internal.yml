@@ -36,7 +36,7 @@ jobs:
         id: version
         run: |
           # Extract current versionCode from build.gradle.kts
-          CURRENT_VERSION_CODE=$(grep -o 'versionCode = [0-9]*' app/build.gradle.kts | awk '{print $2}')
+          CURRENT_VERSION_CODE=$(grep -o 'versionCode = [0-9]*' app/build.gradle.kts | awk '{print $3}')
           echo "Current versionCode: $CURRENT_VERSION_CODE"
           
           # Increment versionCode
@@ -87,4 +87,5 @@ jobs:
           track: internal
 
           status: completed
+
 
