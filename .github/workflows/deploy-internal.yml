@@ -50,6 +50,10 @@ jobs:
           echo "new_version_code=$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
           echo "NEW_VERSION_CODE=$NEW_VERSION_CODE" >> $GITHUB_ENV
 
+          echo "-----------------------------------------"
+          cat app/build.gradle.kts
+          echo "-----------------------------------------"
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -100,6 +104,7 @@ jobs:
           track: internal
 
           status: completed
+
 
 
 
