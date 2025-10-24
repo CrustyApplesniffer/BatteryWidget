@@ -1,6 +1,6 @@
 name: Deploy to Internal Testing
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 on:
@@ -133,6 +133,7 @@ jobs:
           track: internal
 
           status: completed
+
 
 
 
