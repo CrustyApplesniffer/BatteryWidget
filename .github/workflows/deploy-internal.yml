@@ -86,14 +86,29 @@ jobs:
           name: app-bundle
           path: app/build/outputs/bundle/release/*.aab
           retention-days: 7
-
+      
       - name: Commit versionCode increment
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          
+          # Debug: show git status and diff
+          echo "=== Git status ==="
+          git status
+          echo "=== Git diff ==="
+          git diff
+          
           git add app/build.gradle.kts
-          git commit -m "ci: increment versionCode to $NEW_VERSION_CODE"
-          git push
+          
+          echo "=== Staged changes ==="
+          git diff --staged
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "ci: increment versionCode to $NEW_VERSION_CODE"
+            git push
+          fi
 
       - name: Upload to Play Store (Internal Test)
         uses: r0adkll/upload-google-play@v1
@@ -104,6 +119,7 @@ jobs:
           track: internal
 
           status: completed
+
 
 
 
