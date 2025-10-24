@@ -130,8 +130,8 @@ jobs:
           packageName: com.prometeo.batterywidget
           releaseFiles: app/build/outputs/bundle/release/*.aab
           track: internal
-
           status: completed
+
 
 
 
