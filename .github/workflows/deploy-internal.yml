@@ -123,6 +123,12 @@ jobs:
               body: "Automated versionCode increment from GitHub Actions"
             })
 
+      - name: Debug Service Account
+        run: |
+          echo "Service account email (first 10 chars): $(echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' | jq -r '.client_email' | cut -c 1-10)..."
+          echo "Package name: com.prometeo.batterywidget"
+          echo "Service account project ID: $(echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' | jq -r '.project_id')"
+          
       - name: Upload to Play Store (Internal Test)
         uses: r0adkll/upload-google-play@v1
         with:
@@ -131,6 +137,7 @@ jobs:
           releaseFiles: app/build/outputs/bundle/release/*.aab
           track: internal
           status: completed
+
 
 
 
