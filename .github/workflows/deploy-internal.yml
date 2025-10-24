@@ -127,11 +127,12 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-          packageName: com.yourcompany.yourapp
+          packageName: com.prometeo.batterywidget
           releaseFiles: app/build/outputs/bundle/release/*.aab
           track: internal
 
           status: completed
+
 
 
 
