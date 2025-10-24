@@ -16,7 +16,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: writ
+      contents: write
 
     steps:
       - name: Checkout code
@@ -121,6 +121,7 @@ jobs:
           track: internal
 
           status: completed
+
 
 
 
