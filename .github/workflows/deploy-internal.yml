@@ -15,8 +15,6 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout code
@@ -114,6 +112,7 @@ jobs:
       - name: Create Pull Request
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             await github.rest.pulls.create({
               owner: context.repo.owner,
@@ -133,6 +132,7 @@ jobs:
           track: internal
 
           status: completed
+
 
 
 
