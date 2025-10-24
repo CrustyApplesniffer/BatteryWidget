@@ -88,12 +88,11 @@ jobs:
           name: app-bundle
           path: app/build/outputs/bundle/release/*.aab
           retention-days: 7
-      
-      - name: Commit versionCode increment
+           
+      - name: Commit and push to feature branch
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
           # Debug: show git status and diff
           echo "=== Git status ==="
           git status
@@ -109,8 +108,21 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "ci: increment versionCode to $NEW_VERSION_CODE"
-            git push
+            git push origin HEAD:ci/version-increment-$NEW_VERSION_CODE
           fi
+      
+      - name: Create Pull Request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "ci: Increment versionCode to ${{ env.NEW_VERSION_CODE }}",
+              head: "ci/version-increment-${{ env.NEW_VERSION_CODE }}",
+              base: "develop",
+              body: "Automated versionCode increment from GitHub Actions"
+            })
 
       - name: Upload to Play Store (Internal Test)
         uses: r0adkll/upload-google-play@v1
@@ -121,6 +133,7 @@ jobs:
           track: internal
 
           status: completed
+
 
 
 
