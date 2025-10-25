@@ -48,7 +48,15 @@ android {
                 ?: System.getenv("KEYSTORE_FILE")
                 ?: "debug.keystore"
 
-            storeFile = file(keystorePath)
+            val keystoreFile = file(keystorePath)
+            val isDependabot = System.getenv("GITHUB_ACTOR")?.contains("dependabot") == true
+
+            // Fallback to debug.keystore if main keystore doesn't exist (Dependabot case)
+            storeFile = if (!keystoreFile.exists() && isDependabot) {
+                file("debug.keystore")
+            } else {
+                keystoreFile
+            }
 
             storePassword =
                 getLocalProperty("keystore.password") ?:
