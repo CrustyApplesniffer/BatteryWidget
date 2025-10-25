@@ -41,6 +41,7 @@ jobs:
               -keypass android \
               -dname "CN=Android Debug,O=Android,C=US" \
               -noprompt
+            mv debug.keystore app/
           fi
 
       - name: Restore production keystore
