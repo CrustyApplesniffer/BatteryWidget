@@ -138,10 +138,12 @@ jobs:
     - name: Export signing env variables
       if: matrix.build-mode == 'manual'
       run: |
-        echo "KEYSTORE_FILE=keystore.jks" >> $GITHUB_ENV
-        echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
-        echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
-        echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+        if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
+          echo "KEYSTORE_FILE=keystore.jks" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+        fi
 
     - name: Assemble Release
       if: matrix.build-mode == 'manual'
