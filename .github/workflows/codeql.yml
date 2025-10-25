@@ -106,8 +106,30 @@ jobs:
       if: matrix.build-mode == 'manual'
       run: chmod +x ./gradlew
 
-    - name: Restore keystore
+    - name: Ensure debug keystore exists
       if: matrix.build-mode == 'manual'
+      run: |
+        # Créer debug.keystore s'il n'existe pas
+        if [ ! -f "debug.keystore" ]; then
+          keytool -genkeypair \
+            -alias androiddebugkey \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -keystore debug.keystore \
+            -storepass android \
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -noprompt
+          mv debug.keystore app/
+          echo "KEYSTORE_FILE=keystore.jks" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=android" >> $GITHUB_ENV
+          echo "KEY_ALIAS=androiddebugkey" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=android" >> $GITHUB_ENV
+        fi
+
+    - name: Restore keystore
+      if: matrix.build-mode == 'manual' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot-preview[bot]'
       run: |
         if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
           echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/keystore.jks
