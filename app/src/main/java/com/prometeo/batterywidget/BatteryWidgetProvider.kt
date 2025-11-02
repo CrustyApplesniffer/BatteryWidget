@@ -7,11 +7,16 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
 import android.os.BatteryManager
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.widget.RemoteViews
+import androidx.core.graphics.toColorInt
+import androidx.core.content.edit
 import kotlinx.coroutines.*
+import android.util.Log
 
 /**
  * Battery Widget Provider
@@ -33,6 +38,9 @@ class BatteryWidgetProvider : AppWidgetProvider() {
     private val scope = CoroutineScope(Dispatchers.Main)
     private var updateJob: Job? = null
 
+    // Handler for delays on the main thread
+    private val handler = Handler(Looper.getMainLooper())
+
     // Refresh interval constants
     companion object {
         /** Auto mode - updates on battery change events */
@@ -52,6 +60,9 @@ class BatteryWidgetProvider : AppWidgetProvider() {
 
         /** Fallback update interval for AUTO mode (5 minutes) to ensure data freshness */
         private const val FALLBACK_UPDATE_INTERVAL = 300000L
+
+        /** Timeout to stop the service on Android 14+ (30 seconds) */
+        private const val SERVICE_STOP_DELAY = 30000L
     }
 
     /**
@@ -78,13 +89,21 @@ class BatteryWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
+        Log.d("BatteryWidgetProvider", "onUpdate called for ${appWidgetIds.size} widgets")
+
         // Update each widget individually
         appWidgetIds.forEach { appWidgetId ->
             updateWidget(context, appWidgetManager, appWidgetId)
         }
 
-        // Start the monitoring service when widgets are active
-        startBatteryMonitoringService(context)
+        // Handling varies depending on the Android version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android 12+: Temporary service
+            startTemporaryService(context)
+        } else {
+            // Android <12: Permanent service
+            startBatteryMonitoringService(context)
+        }
     }
 
     /**
@@ -94,8 +113,14 @@ class BatteryWidgetProvider : AppWidgetProvider() {
      */
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
+        Log.d("BatteryWidgetProvider", "First widget enabled")
+
         // Start service when first widget is created
-        startBatteryMonitoringService(context)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            startTemporaryService(context)
+        } else {
+            startBatteryMonitoringService(context)
+        }
     }
 
     /**
@@ -105,6 +130,8 @@ class BatteryWidgetProvider : AppWidgetProvider() {
      */
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
+        Log.d("BatteryWidgetProvider", "Last widget disabled")
+
         updateJob?.cancel()
         scope.cancel()
 
@@ -122,13 +149,17 @@ class BatteryWidgetProvider : AppWidgetProvider() {
      */
     override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
         super.onDeleted(context, appWidgetIds)
+        Log.d("BatteryWidgetProvider", "Widgets deleted: ${appWidgetIds?.size}")
+
         updateJob?.cancel()
 
         // Clean up preferences when widget is deleted
         context?.let {
             val prefs = it.getSharedPreferences("BatteryWidgetPrefs", Context.MODE_PRIVATE)
-            appWidgetIds?.forEach { appWidgetId ->
-                prefs.edit().remove("refresh_interval_$appWidgetId").apply()
+            prefs.edit {
+                appWidgetIds?.forEach { appWidgetId ->
+                    remove("refresh_interval_$appWidgetId")
+                }
             }
 
             // Check if any widgets remain, if not stop service
@@ -175,17 +206,43 @@ class BatteryWidgetProvider : AppWidgetProvider() {
     }
 
     // =========================================================================
-    // Service Management Methods
+    // Service Management Methods - NEW METHODS
     // =========================================================================
 
     /**
-     * Starts the battery monitoring service for real-time updates
+     * Starts the battery monitoring service for real-time updates (Android <12)
+     */
+    private fun startBatteryMonitoringService(context: Context) {
+        try {
+            BatteryMonitorService.startService(context, true)
+            Log.d("BatteryWidgetProvider", "Permanent service started")
+        } catch (e: Exception) {
+            Log.e("BatteryWidgetProvider", "Error starting permanent service", e)
+        }
+    }
+
+    /**
+     * Starts temporary service for Android 12+
      *
      * @param context The application context
      */
-    private fun startBatteryMonitoringService(context: Context) {
-        val serviceIntent = Intent(context, BatteryMonitorService::class.java)
-        context.startService(serviceIntent)
+    private fun startTemporaryService(context: Context) {
+        try {
+            // Start the service without foreground for Android 14+
+            val useForeground = Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+            BatteryMonitorService.startService(context, useForeground)
+            Log.d("BatteryWidgetProvider", "Temporary service started (foreground: $useForeground)")
+
+            // Schedule service shutdown after a delay on Android 14+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                handler.postDelayed({
+                    stopBatteryMonitoringService(context)
+                    Log.d("BatteryWidgetProvider", "Service stopped after delay")
+                }, SERVICE_STOP_DELAY)
+            }
+        } catch (e: Exception) {
+            Log.e("BatteryWidgetProvider", "Error starting temporary service", e)
+        }
     }
 
     /**
@@ -194,8 +251,12 @@ class BatteryWidgetProvider : AppWidgetProvider() {
      * @param context The application context
      */
     private fun stopBatteryMonitoringService(context: Context) {
-        val serviceIntent = Intent(context, BatteryMonitorService::class.java)
-        context.stopService(serviceIntent)
+        try {
+            BatteryMonitorService.stopService(context)
+            Log.d("BatteryWidgetProvider", "Service stop requested")
+        } catch (e: Exception) {
+            Log.e("BatteryWidgetProvider", "Error stopping service", e)
+        }
     }
 
     // =========================================================================
@@ -211,6 +272,8 @@ class BatteryWidgetProvider : AppWidgetProvider() {
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val thisWidget = ComponentName(context, BatteryWidgetProvider::class.java)
         val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+
+        Log.d("BatteryWidgetProvider", "Updating ${appWidgetIds.size} auto-mode widgets")
 
         appWidgetIds.forEach { appWidgetId ->
             val prefs = context.getSharedPreferences("BatteryWidgetPrefs", Context.MODE_PRIVATE)
@@ -235,52 +298,56 @@ class BatteryWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int
     ) {
-        val views = RemoteViews(context.packageName, R.layout.battery_widget)
+        try {
+            val views = RemoteViews(context.packageName, R.layout.battery_widget)
 
-        // Get current battery information
-        val batteryStatus = getBatteryStatus(context)
-        val batteryLevel = batteryStatus.level
-        val isCharging = batteryStatus.isCharging
+            // Get current battery information
+            val batteryStatus = getBatteryStatus(context)
+            val batteryLevel = batteryStatus.level
+            val isCharging = batteryStatus.isCharging
 
-        // Update battery percentage text
-        views.setTextViewText(R.id.battery_text, "$batteryLevel%")
+            // Update battery percentage text
+            views.setTextViewText(R.id.battery_text, "$batteryLevel%")
 
-        // Update progress bar
-        views.setProgressBar(R.id.battery_progress, 100, batteryLevel, false)
+            // Update progress bar
+            views.setProgressBar(R.id.battery_progress, 100, batteryLevel, false)
 
-        // Update charging icon visibility
-        if (isCharging) {
-            views.setImageViewResource(R.id.charging_icon, R.drawable.ic_flash)
-            views.setViewVisibility(R.id.charging_icon, android.view.View.VISIBLE)
-        } else {
-            views.setViewVisibility(R.id.charging_icon, android.view.View.GONE)
+            // Update charging icon visibility
+            if (isCharging) {
+                views.setImageViewResource(R.id.charging_icon, R.drawable.ic_flash)
+                views.setViewVisibility(R.id.charging_icon, android.view.View.VISIBLE)
+            } else {
+                views.setViewVisibility(R.id.charging_icon, android.view.View.GONE)
+            }
+
+            // Update background color based on battery level
+            val backgroundColor = getBatteryColor(batteryLevel)
+            views.setInt(R.id.widget_layout, "setBackgroundColor", backgroundColor)
+
+            // =========================================================================
+            // TAP BEHAVIOR: Open battery settings when widget is tapped
+            // =========================================================================
+
+            val batterySettingsIntent = createBatterySettingsIntent(context)
+            val batterySettingsPendingIntent = PendingIntent.getActivity(
+                context,
+                appWidgetId,
+                batterySettingsIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.widget_layout, batterySettingsPendingIntent)
+
+            // Apply the updates to the widget
+            appWidgetManager.updateAppWidget(appWidgetId, views)
+
+            // Schedule the next update based on refresh interval
+            scheduleNextUpdate(context, appWidgetManager, appWidgetId)
+
+            Log.d("BatteryWidgetProvider", "Widget $appWidgetId updated - Battery: $batteryLevel%")
+
+        } catch (e: Exception) {
+            Log.e("BatteryWidgetProvider", "Error updating widget $appWidgetId", e)
         }
-
-        // Update background color based on battery level
-        val backgroundColor = getBatteryColor(batteryLevel)
-        views.setInt(R.id.widget_layout, "setBackgroundColor", backgroundColor)
-
-        // =========================================================================
-        // TAP BEHAVIOR: Open battery settings when widget is tapped
-        // =========================================================================
-
-        // Set click intent to open BATTERY SETTINGS
-
-        val batterySettingsIntent = createBatterySettingsIntent(context)
-        val batterySettingsPendingIntent = PendingIntent.getActivity(
-            context,
-            appWidgetId,
-            batterySettingsIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_layout, batterySettingsPendingIntent)
-
-
-        // Apply the updates to the widget
-        appWidgetManager.updateAppWidget(appWidgetId, views)
-
-        // Schedule the next update based on refresh interval
-        scheduleNextUpdate(context, appWidgetManager, appWidgetId)
     }
 
     // =========================================================================
@@ -296,7 +363,7 @@ class BatteryWidgetProvider : AppWidgetProvider() {
      */
     private fun createBatterySettingsIntent(context: Context): Intent {
         return try {
-            // Primary option: Battery saver settings (Android 5.0+)
+            // Primary option: Battery settings (Android 5.0+)
             Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
@@ -355,12 +422,17 @@ class BatteryWidgetProvider : AppWidgetProvider() {
      * @return Color integer for the widget background
      */
     private fun getBatteryColor(batteryLevel: Int): Int {
-        return when {
-            batteryLevel >= 80 -> Color.parseColor("#FF4CAF50") // Green - High
-            batteryLevel >= 60 -> Color.parseColor("#FF8BC34A") // Light Green - Good
-            batteryLevel >= 40 -> Color.parseColor("#FFFFC107") // Amber/Yellow - Medium
-            batteryLevel >= 20 -> Color.parseColor("#FFFF9800") // Orange - Low
-            else -> Color.parseColor("#FFF44336") // Red - Critical
+        return try {
+            when {
+                batteryLevel >= 80 -> "#FF4CAF50".toColorInt() // Green - High
+                batteryLevel >= 60 -> "#FF8BC34A".toColorInt() // Light Green - Good
+                batteryLevel >= 40 -> "#FFFFC107".toColorInt() // Amber/Yellow - Medium
+                batteryLevel >= 20 -> "#FFFF9800".toColorInt() // Orange - Low
+                else -> "#FFF44336".toColorInt() // Red - Critical
+            }
+        } catch (e: IllegalArgumentException) {
+            Log.e("BatteryWidget", "Invalid color format, using default gray", e)
+            "#FF666666".toColorInt() // Fallback gray
         }
     }
 
