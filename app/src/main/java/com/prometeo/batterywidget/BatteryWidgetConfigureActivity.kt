@@ -1,6 +1,5 @@
 package com.prometeo.batterywidget
 
-import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
@@ -19,11 +18,19 @@ import com.prometeo.batterywidget.databinding.BatteryWidgetConfigureBinding
  */
 class BatteryWidgetConfigureActivity : AppCompatActivity() {
 
-    // View binding instance
+    // =========================================================================
+    // Properties and Constants
+    // =========================================================================
+
+    /** View binding instance */
     private lateinit var binding: BatteryWidgetConfigureBinding
 
-    // Widget ID being configured
+    /** Widget ID being configured */
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
+
+    // =========================================================================
+    // Activity Lifecycle Methods
+    // =========================================================================
 
     /**
      * Called when the activity is first created
@@ -38,7 +45,7 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Set result to CANCELED in case user backs out
-        setResult(Activity.RESULT_CANCELED)
+        setResult(RESULT_CANCELED)
 
         // Extract widget ID from the intent
         val intent = intent
@@ -107,7 +114,7 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
         binding.spinnerRefreshInterval.adapter = adapter
 
         // Load current setting and set spinner selection
-        val prefs = getSharedPreferences("BatteryWidgetPrefs", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("BatteryWidgetPrefs", MODE_PRIVATE)
 
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             // Informational mode - load default settings
@@ -196,7 +203,7 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
         }
 
         // Save default preference to SharedPreferences
-        val prefs = getSharedPreferences("BatteryWidgetPrefs", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("BatteryWidgetPrefs", MODE_PRIVATE)
         prefs.edit().putInt("default_refresh_interval", selectedInterval).apply()
 
         // Show confirmation message
@@ -221,7 +228,7 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
         }
 
         // Save preference to SharedPreferences for this specific widget
-        val prefs = getSharedPreferences("BatteryWidgetPrefs", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("BatteryWidgetPrefs", MODE_PRIVATE)
         prefs.edit().putInt("refresh_interval_$appWidgetId", selectedInterval).apply()
 
         // Update the specific widget with new configuration
@@ -232,7 +239,7 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
         // Set result and finish activity
         val resultValue = Intent()
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        setResult(Activity.RESULT_OK, resultValue)
+        setResult(RESULT_OK, resultValue)
 
         // Show confirmation message
         Toast.makeText(this, "Widget settings saved!", Toast.LENGTH_SHORT).show()
@@ -260,7 +267,7 @@ class BatteryWidgetConfigureActivity : AppCompatActivity() {
         val thisWidget = android.content.ComponentName(this, BatteryWidgetProvider::class.java)
         val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
 
-        val prefs = getSharedPreferences("BatteryWidgetPrefs", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("BatteryWidgetPrefs", MODE_PRIVATE)
         val editor = prefs.edit()
 
         appWidgetIds.forEach { widgetId ->

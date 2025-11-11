@@ -4,54 +4,91 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
-import com.prometeo.batterywidget.databinding.ActivityMainBinding
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-
+import com.prometeo.batterywidget.databinding.ActivityMainBinding
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Main Activity for Battery Widget App
  *
  * Provides information about the app and instructions for using the widget.
  * This activity serves as the entry point when users launch the app from the launcher.
+ * Displays comprehensive app information, device details, and provides navigation
+ * to widget configuration and system battery settings.
  */
 class MainActivity : AppCompatActivity() {
 
-    // View binding instance
+    // =========================================================================
+    // Class Properties
+    // =========================================================================
+
     private lateinit var binding: ActivityMainBinding
+
+    // =========================================================================
+    // Activity Lifecycle Methods
+    // =========================================================================
 
     /**
      * Called when the activity is first created
      *
-     * @param savedInstanceState Previously saved instance state
+     * @param savedInstanceState Previously saved instance state, null if fresh start
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1) We manage the system bars ourselves
+        Log.d("MainActivity", "onCreate")
+
+        // Configure system window behavior
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        // 2) Inflate
+        // Initialize view binding
         binding = ActivityMainBinding.inflate(layoutInflater)
 
-        // 3) Define text BEFORE setContentView (avoids warning)
+        // Set app info text before setting content view to avoid warnings
         binding.textView.text = createAppInfoText()
 
-        // 4) Apply view
+        // Set the content view
         setContentView(binding.root)
 
-        // 5) Apply insets UP AND DOWN
+        // Apply window insets for proper system bar handling
+        applyWindowInsets()
+
+        // Set up button click listeners
+        setupButtons()
+    }
+
+    /**
+     * Called when the activity is being destroyed
+     */
+    //override fun onDestroy() {
+    //    // Debug logging to track service stops
+    //    BatteryMonitorService.amITheStopper(this, "MainActivity.onDestroy")
+    //    super.onDestroy()
+    //}
+
+    // =========================================================================
+    // UI Setup Methods
+    // =========================================================================
+
+    /**
+     * Applies window insets to handle system bars properly
+     *
+     * Ensures content doesn't overlap with status and navigation bars
+     * by adding appropriate padding.
+     */
+    private fun applyWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            // Add top AND bottom padding
+            // Add top AND bottom padding to avoid system bars
             view.updatePadding(
                 top = systemBars.top,
                 bottom = systemBars.bottom
@@ -59,13 +96,35 @@ class MainActivity : AppCompatActivity() {
 
             insets
         }
-
-        // 6) Boutons
-        setupButtons()
     }
 
+    /**
+     * Sets up button click listeners for the main activity
+     */
+    private fun setupButtons() {
+        // Configure Widgets Button - Opens configuration activity
+        binding.btnConfigureWidgets.text = getString(R.string.configure_widgets)
+        binding.btnConfigureWidgets.setOnClickListener {
+            openConfigurationActivity()
+        }
 
+        // Open Battery Settings Button - Opens system battery settings
+        binding.btnBatterySettings.text = getString(R.string.battery_settings)
+        binding.btnBatterySettings.setOnClickListener {
+            openBatterySettings()
+        }
+    }
 
+    // =========================================================================
+    // App Information Methods
+    // =========================================================================
+
+    /**
+     * Creates comprehensive app information text
+     *
+     * @return Formatted string containing app version, device info,
+     *         and usage instructions
+     */
     private fun createAppInfoText(): String {
         val packageInfo = packageManager.getPackageInfo(packageName, 0)
         val versionName = packageInfo.versionName
@@ -92,12 +151,26 @@ class MainActivity : AppCompatActivity() {
             compileSdkCode = compileSdk.toString(),
             buildDate = buildDate,
             currentSdkName = getAndroidVersionName(Build.VERSION.SDK_INT),
-            currentSdkCode = Build.VERSION.SDK_INT.toString(),
-            manufacturer = Build.MANUFACTURER,
-            model = Build.MODEL
+            currentSdkCode = Build.VERSION.SDK_INT.toString()
         )
     }
 
+    /**
+     * Formats app information into a readable string
+     *
+     * @param versionName App version name
+     * @param versionCode App version code
+     * @param minSdkName Minimum supported Android version name
+     * @param minSdkCode Minimum supported Android version code
+     * @param targetSdkName Target Android version name
+     * @param targetSdkCode Target Android version code
+     * @param compileSdkName Compile SDK version name
+     * @param compileSdkCode Compile SDK version code
+     * @param buildDate Build date and time
+     * @param currentSdkName Current device Android version name
+     * @param currentSdkCode Current device Android version code
+     * @return Formatted multi-line string with all app information
+     */
     private fun getFormattedAppInfoText(
         versionName: String?,
         versionCode: String,
@@ -109,9 +182,7 @@ class MainActivity : AppCompatActivity() {
         compileSdkCode: String,
         buildDate: String,
         currentSdkName: String,
-        currentSdkCode: String,
-        manufacturer: String,
-        model: String
+        currentSdkCode: String
     ): String {
         return """
         |${getString(R.string.app_title)}
@@ -157,7 +228,7 @@ class MainActivity : AppCompatActivity() {
         |
         |${getString(R.string.device_info)}
         |${getString(R.string.current_android, currentSdkName, currentSdkCode)}
-        |${getString(R.string.device_model, manufacturer, model)}
+        |${getString(R.string.device_model, Build.MANUFACTURER, Build.MODEL)}
         |
         |${getString(R.string.troubleshooting)}
         |
@@ -170,6 +241,11 @@ class MainActivity : AppCompatActivity() {
     """.trimMargin()
     }
 
+    /**
+     * Gets the build date from BuildConfig
+     *
+     * @return Formatted build date string, current date if build time not available
+     */
     private fun getBuildDate(): String {
         return try {
             val buildTime = BuildConfig.BUILD_TIME.toLong()
@@ -181,15 +257,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Gets the minimum SDK version from BuildConfig
+     *
+     * @return Minimum SDK version, fallback to LOLLIPOP if not available
+     */
     private fun getMinSdkVersion(): Int {
         return try {
             BuildConfig.MIN_SDK_VERSION
         } catch (_: Exception) {
-            // Fallback
+            // Fallback to Android 5.0 (Lollipop)
             Build.VERSION_CODES.LOLLIPOP
         }
     }
 
+    /**
+     * Gets the target SDK version from BuildConfig
+     *
+     * @return Target SDK version, fallback to current SDK if not available
+     */
     private fun getTargetSdkVersion(): Int {
         return try {
             BuildConfig.TARGET_SDK_VERSION
@@ -198,6 +284,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Gets the compile SDK version from BuildConfig
+     *
+     * @return Compile SDK version, fallback to 34 if not available
+     */
     private fun getCompileSdkVersion(): Int {
         return try {
             BuildConfig.COMPILE_SDK_VERSION
@@ -206,6 +297,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Converts Android API level to version name
+     *
+     * @param apiLevel Android API level to convert
+     * @return Human-readable Android version name
+     */
     private fun getAndroidVersionName(apiLevel: Int): String {
         return when (apiLevel) {
             Build.VERSION_CODES.BASE -> getString(R.string.android_1_0)
@@ -255,35 +352,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     // =========================================================================
-    // Button Setup Methods
-    // =========================================================================
-
-    /**
-     * Sets up button click listeners for the main activity
-     */
-    private fun setupButtons() {
-        // Configure Widgets Button - Opens configuration activity
-        binding.btnConfigureWidgets.text = getString(R.string.configure_widgets)
-        binding.btnConfigureWidgets.setOnClickListener {
-            openConfigurationActivity()
-        }
-
-        // Open Battery Settings Button - Opens system battery settings
-        binding.btnBatterySettings.text = getString(R.string.battery_settings)
-        binding.btnBatterySettings.setOnClickListener {
-            openBatterySettings()
-        }
-    }
-
-    // =========================================================================
     // Navigation Methods
     // =========================================================================
 
     /**
      * Opens the widget configuration activity
-     * This allows users to configure default settings for new widgets
+     *
+     * Launches the configuration activity to allow users to configure
+     * default settings for new widgets.
      */
     private fun openConfigurationActivity() {
+        Log.d("MainActivity", "openConfigurationActivity")
         // Open in informational mode to configure default settings
         val intent = BatteryWidgetConfigureActivity.createConfigurationIntent(this)
         startActivity(intent)
@@ -291,9 +370,12 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Opens the system battery settings screen
-     * This provides access to system-level battery controls and information
+     *
+     * Provides access to system-level battery controls and information
+     * with multiple fallback options for different Android versions.
      */
     private fun openBatterySettings() {
+        Log.d("MainActivity", "openBatterySettings")
         try {
             // Primary option: Battery saver settings (Android 5.0+)
             val intent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
@@ -317,4 +399,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // =========================================================================
+    // Unused Methods (Commented for future reference)
+    // =========================================================================
+
+    /*
+    /**
+     * Example of an unused method that could be implemented later
+     * for additional functionality like analytics tracking.
+     */
+    private fun trackUserInteraction() {
+        // Implementation for analytics tracking would go here
+    }
+    */
 }

@@ -9,14 +9,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.widget.RemoteViews
 import androidx.core.graphics.toColorInt
 import androidx.core.content.edit
 import kotlinx.coroutines.*
 import android.util.Log
+import androidx.annotation.RequiresApi
 
 /**
  * Battery Widget Provider
@@ -34,14 +33,16 @@ import android.util.Log
  */
 class BatteryWidgetProvider : AppWidgetProvider() {
 
-    // Coroutine scope for handling background updates
+    // =========================================================================
+    // Properties and Constants
+    // =========================================================================
+
+    /** Coroutine scope for handling background updates */
     private val scope = CoroutineScope(Dispatchers.Main)
+
+    /** Current update job */
     private var updateJob: Job? = null
 
-    // Handler for delays on the main thread
-    private val handler = Handler(Looper.getMainLooper())
-
-    // Refresh interval constants
     companion object {
         /** Auto mode - updates on battery change events */
         const val REFRESH_AUTO = 0
@@ -61,8 +62,6 @@ class BatteryWidgetProvider : AppWidgetProvider() {
         /** Fallback update interval for AUTO mode (5 minutes) to ensure data freshness */
         private const val FALLBACK_UPDATE_INTERVAL = 300000L
 
-        /** Timeout to stop the service on Android 14+ (30 seconds) */
-        private const val SERVICE_STOP_DELAY = 30000L
     }
 
     /**
@@ -97,11 +96,9 @@ class BatteryWidgetProvider : AppWidgetProvider() {
         }
 
         // Handling varies depending on the Android version
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Android 12+: Temporary service
-            startTemporaryService(context)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startBatteryMonitoringForAndroid14(context)
         } else {
-            // Android <12: Permanent service
             startBatteryMonitoringService(context)
         }
     }
@@ -116,8 +113,9 @@ class BatteryWidgetProvider : AppWidgetProvider() {
         Log.d("BatteryWidgetProvider", "First widget enabled")
 
         // Start service when first widget is created
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            startTemporaryService(context)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            Log.d("BatteryWidgetProvider", "Scheduling JobService for Android 14+")
+            startBatteryMonitoringForAndroid14(context)
         } else {
             startBatteryMonitoringService(context)
         }
@@ -131,14 +129,9 @@ class BatteryWidgetProvider : AppWidgetProvider() {
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
         Log.d("BatteryWidgetProvider", "Last widget disabled")
-
         updateJob?.cancel()
         scope.cancel()
 
-        // Stop service when last widget is removed
-        context?.let {
-            stopBatteryMonitoringService(it)
-        }
     }
 
     /**
@@ -149,6 +142,7 @@ class BatteryWidgetProvider : AppWidgetProvider() {
      */
     override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
         super.onDeleted(context, appWidgetIds)
+        //BatteryMonitorService.amITheStopper(context!!, "BatteryWidgetProvider.onDeleted")
         Log.d("BatteryWidgetProvider", "Widgets deleted: ${appWidgetIds?.size}")
 
         updateJob?.cancel()
@@ -162,14 +156,10 @@ class BatteryWidgetProvider : AppWidgetProvider() {
                 }
             }
 
-            // Check if any widgets remain, if not stop service
-            val appWidgetManager = AppWidgetManager.getInstance(it)
-            val thisWidget = ComponentName(it, BatteryWidgetProvider::class.java)
-            val remainingAppWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
-
-            if (remainingAppWidgetIds.isEmpty()) {
-                stopBatteryMonitoringService(it)
-            }
+            // Use a delayed check to avoid race conditions
+            //handler.postDelayed({
+            //    checkAndStopServiceIfNeeded(it)
+            //}, 1000L) // Wait 1 second for the system to process the deletion
         }
     }
 
@@ -206,18 +196,128 @@ class BatteryWidgetProvider : AppWidgetProvider() {
     }
 
     // =========================================================================
-    // Service Management Methods - NEW METHODS
+    // Service Management Methods
     // =========================================================================
 
     /**
      * Starts the battery monitoring service for real-time updates (Android <12)
+     *
+     * @param context The application context
      */
     private fun startBatteryMonitoringService(context: Context) {
         try {
-            BatteryMonitorService.startService(context, true)
-            Log.d("BatteryWidgetProvider", "Permanent service started")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                // Android 14+ - Use optimized approach
+                startBatteryMonitoringForAndroid14(context)
+            } else {
+                // Older Android versions - Use standard service
+                val useForeground = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                BatteryMonitorService.startService(context, useForeground)
+                Log.d("BatteryWidgetProvider", "Service started for older Android")
+            }
         } catch (e: Exception) {
-            Log.e("BatteryWidgetProvider", "Error starting permanent service", e)
+            Log.e("BatteryWidgetProvider", "Error starting service", e)
+            updateAllWidgetsForAutoMode(context)
+        }
+    }
+
+    /**
+     * Starts battery monitoring for Android 14+ using JobScheduler
+     *
+     * @param context The application context
+     */
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private fun startBatteryMonitoringForAndroid14(context: Context) {
+        Log.d("BatteryWidgetProvider", "Using JobScheduler for Android 14+")
+
+        if (!hasAutoModeWidgets(context)) {
+            Log.d("BatteryWidgetProvider", "No AUTO mode widgets, skipping monitoring")
+            return
+        }
+
+        // Use JobScheduler instead of standard service
+        if (scheduleBatteryJob(context)) {
+            Log.d("BatteryWidgetProvider", "✅ JobScheduler SUCCESS - job should start in 1-5s")
+        } else {
+            Log.e("BatteryWidgetProvider", "❌ JobScheduler FAILED, using fallback service")
+            tryStartServiceOnce(context)
+        }
+    }
+
+    /**
+     * Schedules a battery monitoring job using JobScheduler
+     *
+     * @param context The application context
+     * @return true if job scheduling was successful, false otherwise
+     */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun scheduleBatteryJob(context: Context): Boolean {
+        try {
+            val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as android.app.job.JobScheduler
+
+            // Cancel any existing job
+            jobScheduler.cancel(1)
+
+            val jobInfo = android.app.job.JobInfo.Builder(1,
+                ComponentName(context, BatteryJobService::class.java)
+            )
+                .setRequiredNetworkType(android.app.job.JobInfo.NETWORK_TYPE_NONE)
+                .setPersisted(true) // Survives reboots
+                .setMinimumLatency(1000) // 1 second
+                .setOverrideDeadline(5000) // 5 seconds maximum
+                .build()
+
+            val result = jobScheduler.schedule(jobInfo)
+            val success = result == android.app.job.JobScheduler.RESULT_SUCCESS
+            Log.d("BatteryWidgetProvider", "Job scheduling result: $success")
+            return success
+        } catch (e: Exception) {
+            Log.e("BatteryWidgetProvider", "Error scheduling JobService", e)
+            return false
+        }
+    }
+
+    /**
+     * Attempts to start the service once as a fallback
+     *
+     * @param context The application context
+     */
+    private fun tryStartServiceOnce(context: Context) {
+        try {
+            // Try to start service once (may work if app is in foreground)
+            BatteryMonitorService.startService(context, false)
+            Log.d("BatteryWidgetProvider", "Service started as fallback")
+        } catch (e: Exception) {
+            Log.e("BatteryWidgetProvider", "Fallback service also failed", e)
+        }
+    }
+
+    /**
+     * Check if any widgets are in AUTO mode
+     *
+     * @param context The application context
+     * @return true if any widget is in AUTO mode, false otherwise
+     */
+    private fun hasAutoModeWidgets(context: Context): Boolean {
+        try {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val thisWidget = ComponentName(context, BatteryWidgetProvider::class.java)
+            val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+
+            if (appWidgetIds.isEmpty()) {
+                return false
+            }
+
+            val prefs = context.getSharedPreferences("BatteryWidgetPrefs", Context.MODE_PRIVATE)
+
+            // Check if any widget is in AUTO mode
+            return appWidgetIds.any { appWidgetId ->
+                val refreshInterval = prefs.getInt("refresh_interval_$appWidgetId", REFRESH_AUTO)
+                refreshInterval == REFRESH_AUTO
+            }
+        } catch (e: Exception) {
+            Log.e("BatteryWidgetProvider", "Error checking AUTO mode widgets", e)
+            return false
         }
     }
 
@@ -226,38 +326,76 @@ class BatteryWidgetProvider : AppWidgetProvider() {
      *
      * @param context The application context
      */
+    /*
     private fun startTemporaryService(context: Context) {
         try {
-            // Start the service without foreground for Android 14+
-            val useForeground = Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE
-            BatteryMonitorService.startService(context, useForeground)
-            Log.d("BatteryWidgetProvider", "Temporary service started (foreground: $useForeground)")
-
-            // Schedule service shutdown after a delay on Android 14+
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                handler.postDelayed({
-                    stopBatteryMonitoringService(context)
-                    Log.d("BatteryWidgetProvider", "Service stopped after delay")
-                }, SERVICE_STOP_DELAY)
-            }
+            startBatteryMonitoringService(context)
         } catch (e: Exception) {
             Log.e("BatteryWidgetProvider", "Error starting temporary service", e)
         }
     }
+    */
 
     /**
      * Stops the battery monitoring service
      *
      * @param context The application context
      */
+    /*
     private fun stopBatteryMonitoringService(context: Context) {
         try {
+            Log.d("BatteryWidgetProvider", "stopBatteryMonitoringService called from:", Throwable("BatteryWidgetProvider stop stack trace"))
             BatteryMonitorService.stopService(context)
             Log.d("BatteryWidgetProvider", "Service stop requested")
         } catch (e: Exception) {
             Log.e("BatteryWidgetProvider", "Error stopping service", e)
         }
     }
+    */
+
+    /**
+     * Check if any widgets remain and stop service only if truly no widgets left
+     *
+     * @param context The application context
+     */
+    /*
+    private fun checkAndStopServiceIfNeeded(context: Context) {
+        try {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val thisWidget = ComponentName(context, BatteryWidgetProvider::class.java)
+            val remainingAppWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+
+            Log.d("BatteryWidgetProvider", "DELETION CHECK: Remaining widgets: ${remainingAppWidgetIds.size}")
+
+            // Only stop if ABSOLUTELY sure - be very conservative
+            if (remainingAppWidgetIds.isEmpty()) {
+                Log.d("BatteryWidgetProvider", "CONFIRMED: No widgets remaining after deletion")
+
+                // Double-check after another delay to be absolutely sure
+                handler.postDelayed({
+                    val finalCheck = appWidgetManager.getAppWidgetIds(thisWidget)
+                    if (finalCheck.isEmpty()) {
+                        Log.d("BatteryWidgetProvider", "FINAL CONFIRMATION: Stopping service - no widgets")
+                        //stopBatteryMonitoringService(context)
+                    } else {
+                        Log.d("BatteryWidgetProvider", "Widgets reappeared, keeping service running")
+                    }
+                }, 3000L) // Wait 3 seconds for final confirmation
+            } else {
+                Log.d("BatteryWidgetProvider", "Widgets still exist, keeping service running")
+
+                // Log which widgets are still present and their modes
+                remainingAppWidgetIds.forEach { appWidgetId ->
+                    val prefs = context.getSharedPreferences("BatteryWidgetPrefs", Context.MODE_PRIVATE)
+                    val refreshInterval = prefs.getInt("refresh_interval_$appWidgetId", REFRESH_AUTO)
+                    Log.d("BatteryWidgetProvider", "Widget $appWidgetId - Mode: $refreshInterval")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("BatteryWidgetProvider", "Error in widget deletion check", e)
+        }
+    }
+    */
 
     // =========================================================================
     // Widget Update Methods
@@ -328,7 +466,7 @@ class BatteryWidgetProvider : AppWidgetProvider() {
             // TAP BEHAVIOR: Open battery settings when widget is tapped
             // =========================================================================
 
-            val batterySettingsIntent = createBatterySettingsIntent(context)
+            val batterySettingsIntent = createBatterySettingsIntent()
             val batterySettingsPendingIntent = PendingIntent.getActivity(
                 context,
                 appWidgetId,
@@ -361,19 +499,21 @@ class BatteryWidgetProvider : AppWidgetProvider() {
      * @param context The application context
      * @return Intent configured to open battery settings
      */
-    private fun createBatterySettingsIntent(context: Context): Intent {
+    private fun createBatterySettingsIntent(): Intent {
         return try {
             // Primary option: Battery settings (Android 5.0+)
             Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
         } catch (e: Exception) {
+            Log.w("BatteryWidgetProvider", "FAILED to create battery settings intent", e)
             try {
                 // Fallback 1: Power usage settings
                 Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
             } catch (e: Exception) {
+                Log.w("BatteryWidgetProvider", "FAILED to create Power usage settings intent", e)
                 // Fallback 2: General settings
                 Intent(Settings.ACTION_SETTINGS).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -431,7 +571,7 @@ class BatteryWidgetProvider : AppWidgetProvider() {
                 else -> "#FFF44336".toColorInt() // Red - Critical
             }
         } catch (e: IllegalArgumentException) {
-            Log.e("BatteryWidget", "Invalid color format, using default gray", e)
+            Log.e("BatteryWidgetProvider", "Invalid color format, using default gray", e)
             "#FF666666".toColorInt() // Fallback gray
         }
     }
@@ -457,16 +597,16 @@ class BatteryWidgetProvider : AppWidgetProvider() {
         // Use the new method that supports default settings
         val refreshInterval = getRefreshInterval(context, appWidgetId)
 
-        if (refreshInterval != REFRESH_AUTO) {
+        updateJob = if (refreshInterval != REFRESH_AUTO) {
             // For manual intervals, schedule the next update
-            updateJob = scope.launch {
+            scope.launch {
                 delay(refreshInterval.toLong())
                 updateWidget(context, appWidgetManager, appWidgetId)
             }
         } else {
             // For AUTO mode, we rely on battery change broadcasts
             // But also schedule a fallback update to ensure data freshness
-            updateJob = scope.launch {
+            scope.launch {
                 delay(FALLBACK_UPDATE_INTERVAL)
                 updateWidget(context, appWidgetManager, appWidgetId)
             }
