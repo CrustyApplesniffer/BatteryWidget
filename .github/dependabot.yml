@@ -9,3 +9,13 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+ ignore:
+      # WARNING: Kotlin > 2.2.30 incompatible with CodeQL
+      # To be updated when CodeQL supports Kotlin 2.3+
+      # Issue: https://github.com/github/codeql/issues/XXXXX
+      # Expected re-evaluation date: 2026-04-01
+      # TEMPORARILY ignore Kotlin 2.3.x
+      - dependency-name: "org.jetbrains.kotlin:*"
+        versions: ["2.3.x"] 
+        until: 2026-04-01
+      
