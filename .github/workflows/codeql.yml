@@ -106,6 +106,16 @@ jobs:
       if: matrix.build-mode == 'manual'
       run: chmod +x ./gradlew
 
+    - name: Cache Gradle
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
     - name: Ensure debug keystore exists
       if: matrix.build-mode == 'manual'
       run: |
